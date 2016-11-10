@@ -40,7 +40,7 @@ Note that since the data in `stream_payment.csv` come in sequential order, we pr
 ### Feature 2: Search for 2nd Order Friend in graph
 __Feature 2__ can be accompolished by searching for both the existing edges and the nodes that are connected to the neighbors of the new transaction. 
 
-Using command:
+Using command similar to the following one:
 
 	`any( id2 in adjacency_mat[adjacency_index[x]]['neighbor'] for x in adjacency_mat[adjacency_index[id1]]['neighbor'] )`
 
