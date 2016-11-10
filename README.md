@@ -4,7 +4,7 @@
 ## Data Clean
 The given batch data are well-formated, especially the 'message' section, which contains extra commas in sentences. Some sentences even take multiple lines which are very hard to read if we load the '.csv' file directly into the dataframe. 
 
-In the './src' directory, I include the 'preprocessing()' method in the 'read\_map.py' file
+In the './src' directory, I include the 'preprocessing()' method in the "read\_map.py" file
 
 
 ## Solution strategy
