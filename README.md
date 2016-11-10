@@ -19,4 +19,5 @@ Given the transaction data, which include the `id1` as sender, and `id2` as the 
 
 where the list of neighbors contains all neighbors of `id1` in a transaction network. Similarly for `id2`. Note that each transcation yields two elements in `adjancency_mat`, since the graph is undirected. 
 
+Also, we use a hash table to store the location of each node id in `adjacency_mat`, called `adjacency_index`. `adjacency_index` is a dictionary with keys are the node id, and values are the index of corresponding dictionary element in `adjacency_mat`.
 
