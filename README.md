@@ -26,3 +26,13 @@ Also, we use a hash table to store the location of each node id in `adjacency_ma
 	`adjacency_index = {id1: loc1, id2: loc2, id3: loc3, ... }`
 
 Using `adjacency_index`, we can search the `adjacency_mat` in $O(1)$ time.
+
+
+### Feature 1: Search for existing edges in graph
+To complete the _Feature 1_ requirement, we only need to search if the edge for a new transaction exist in the given graph. 
+
+Using command
+
+	`return (id2 in adjacency_mat[adjacency_index[id1]]['neighbor']) or (id1 in adjacency_mat[adjacency_index[id2]]['neighbor'])`
+
+Note that since the data in `stream_payment.csv` come in sequential order, we process them line by line and adding existing edges to the graph.
