@@ -29,7 +29,7 @@ Using `adjacency_index`, we can search the `adjacency_mat` in $O(1)$ time.
 
 
 ### Feature 1: Search for existing edges in graph
-To complete the _Feature 1_ requirement, we only need to search if the edge for a new transaction exist in the given graph. 
+To complete the __Feature 1__ requirement, we only need to search if the edge for a new transaction exist in the given graph. 
 
 Using command
 
@@ -38,7 +38,7 @@ Using command
 Note that since the data in `stream_payment.csv` come in sequential order, we process them line by line and adding existing edges to the graph.
 
 ### Feature 2: Search for 2nd Order Friend in graph
-_Feature 2_ can be accompolished by searching for both the existing edges and the nodes that are connected to the neighbors of the new transaction. 
+__Feature 2__ can be accompolished by searching for both the existing edges and the nodes that are connected to the neighbors of the new transaction. 
 
 Using command:
 
