@@ -24,3 +24,5 @@ where the list of neighbors contains all neighbors of `id1` in a transaction net
 Also, we use a hash table to store the location of each node id in `adjacency_mat`, called `adjacency_index`. `adjacency_index` is a dictionary with keys being the node id, and values being the index of corresponding dictionary element in `adjacency_mat`.
 
 	`adjacency_index = {id1: loc1, id2: loc2, id3: loc3, ... }`
+
+Using `adjacency_index`, we can search the `adjacency_mat` in $O(1)$ time.
