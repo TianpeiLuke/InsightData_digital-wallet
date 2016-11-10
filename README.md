@@ -36,3 +36,11 @@ Using command
 	`return (id2 in adjacency_mat[adjacency_index[id1]]['neighbor']) or (id1 in adjacency_mat[adjacency_index[id2]]['neighbor'])`
 
 Note that since the data in `stream_payment.csv` come in sequential order, we process them line by line and adding existing edges to the graph.
+
+### Feature 2: Search for 2nd Order Friend in graph
+_Feature 2_ can be accompolished by searching for both the existing edges and the nodes that are connected to the neighbors of the new transaction. 
+
+Using command:
+
+	`any( id2 in adjacency_mat[adjacency_index[x]]['neighbor'] for x in adjacency_mat[adjacency_index[id1]]['neighbor'] )`
+
