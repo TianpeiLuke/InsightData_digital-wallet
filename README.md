@@ -13,5 +13,7 @@ The key for solving the problem is to find efficient data structures to infer th
 
 
 ### Data structure
-Given the transaction data, which includes the `id1` as sender, and `id2` as the receiver. We build the adjacency matrix using list of dictionaries, called `adjacency_mat`. Each dictionary has format `{'key': id1, 'neighbor': list of neighbors }`
+Given the transaction data, which includes the `id1` as sender, and `id2` as the receiver. We build the adjacency matrix using list of dictionaries, called `adjacency_mat`. Each dictionary has format 
+
+	`{'key': id1, 'neighbor': list of neighbors }`
 
