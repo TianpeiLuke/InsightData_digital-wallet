@@ -28,6 +28,11 @@ Also, we use a hash table to store the location of each node id in `adjacency_ma
 Using `adjacency_index`, we can search the `adjacency_mat` in $O(1)$ time.
 
 
+Finally, to implement the Feature 3, we need to build the 2nd-order adjacency matrix. That is, for each node, not only account for its neighbors, also acount for the neighbors of neighbors.
+
+We call the 2nd-order adjacency matrix as `adjancency_mat_2nd`. Note that to avoid self-loop, we need to remove the `key` from the neighbor list.  
+
+
 ### Feature 1: Search for existing edges in graph
 To complete the __Feature 1__ requirement, we only need to search if the edge for a new transaction exist in the given graph. 
 
@@ -44,3 +49,9 @@ Using command similar to the following one:
 
 	`any( id2 in adjacency_mat[adjacency_index[x]]['neighbor'] for x in adjacency_mat[adjacency_index[id1]]['neighbor'] )`
 
+### Feature 3: Search for within 4th order Friend in graph
+Similar to __Feature 2__, we consider 4th order friendship as \"2nd order friend to 2nd order friend\". 
+
+Using the 2nd-order adjacency matrix `adjacency_mat_2nd`, we have 
+
+	`any( id2 in adjacency_mat_2nd[adjacency_index[x]]['neighbor'] for x in adjacency_mat_2nd[adjacency_index[id1]]['neighbor'] )`
