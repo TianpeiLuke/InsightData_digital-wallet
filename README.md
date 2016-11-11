@@ -50,7 +50,7 @@ Using command similar to the following one:
 	`any( id2 in adjacency_mat[adjacency_index[x]]['neighbor'] for x in adjacency_mat[adjacency_index[id1]]['neighbor'] )`
 
 ### Feature 3: Search for within 4th order Friend in graph
-Similar to __Feature 2__, we consider 4th order friendship as \"2nd order friend to 2nd order friend\". 
+Similar to __Feature 2__, we consider 4th order friendship as _"2nd order friend to 2nd order friend"_. 
 
 Using the 2nd-order adjacency matrix `adjacency_mat_2nd`, we have 
 
