@@ -55,3 +55,7 @@ Similar to __Feature 2__, we consider 4th order friendship as _"2nd order friend
 Using the 2nd-order adjacency matrix `adjacency_mat_2nd`, we have 
 
 	`any( id2 in adjacency_mat_2nd[adjacency_index[x]]['neighbor'] for x in adjacency_mat_2nd[adjacency_index[id1]]['neighbor'] )`
+
+### Note
+
+In the runtime, there is an option to choose whether or not to do preprocessing. Usually, choose 'N'. If do it, then choose 'Y'
