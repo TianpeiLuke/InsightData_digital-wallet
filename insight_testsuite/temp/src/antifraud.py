@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import itertools
 import copy
-from read_map import preprocessing, read_df, edge_hash
+from read_map import preprocessing, read_df, edge_hash, edge_hash_2nd
 #from antifraud import is_verified, add_Df, add_edge, is_2ndFriend, is_4thFriend
 
 def add_Df(Df, line):
@@ -60,6 +60,106 @@ def add_edge(adjacency_mat, adjacency_index, line):
         
     return adjacency_mat, adjacency_index
     
+
+def add_edge_2nd(adjacency_mat_2nd, adjacency_mat, adjacency_index, line):
+    N = len(adjacency_index)-1 #adjacency_index[max(adjacency_index, key=adjacency_index.get)]
+
+    temp = line.strip('\n').split(', ')
+    tokens = temp[0:5]
+    node1 = int(tokens[1])
+    node2 = int(tokens[2])
+
+    #if any(d['key'] == node1 for d in adjacency_mat):
+    try:
+        loc = adjacency_index[node1] 
+    except (KeyError, IndexError):
+        neighbor_expand = []
+        neighbor_expand = neighbor_expand + [node2]
+        # find neighbor of neighbor
+        try: 
+            loc12 = adjacency_index[node2]  
+        except (KeyError, IndexError):
+            dict1 = {'key': node1, 'neighbor': [node2] }
+            adjacency_mat_2nd.append(dict1) 
+        else:    
+            neighbor_expand = list(set(neighbor_expand + adjacency_mat[loc12]['neighbor']))
+            if node1 in neighbor_expand:
+                neighbor_expand.remove(node1)
+            dict1 = {'key': node1, 'neighbor': neighbor_expand }
+            adjacency_mat_2nd.append(dict1) 
+
+            #update other neighbors
+            for other in neighbor_expand:
+                adjacency_mat_2nd[adjacency_index[other]]['neighbor'].append(node1)
+    else:
+        neighbor_expand = []
+        neighbor_expand = neighbor_expand + [node2]
+        # find neighbor of neighbor
+        try:
+            loc12 = adjacency_index[node2]      
+        except (KeyError, IndexError):
+            pass            
+        else:
+            neighbor_expand = list(set(neighbor_expand + adjacency_mat[loc12]['neighbor']))
+        #except IndexError:
+        #    print(adjacency_mat[loc12])
+        #    raise
+
+            if node1 in neighbor_expand:
+                neighbor_expand.remove(node1)
+            # update others
+            for other in neighbor_expand:
+                adjacency_mat_2nd[adjacency_index[other]]['neighbor'].append(node1)    
+                adjacency_mat_2nd[adjacency_index[other]]['neighbor']= list(set(adjacency_mat_2nd[adjacency_index[other]]['neighbor']))
+         
+        adjacency_mat_2nd[loc]['neighbor'] = list(set(adjacency_mat_2nd[loc]['neighbor'] + neighbor_expand))
+ 
+    #if any(d['key'] == node2 for d in adjacency_mat):
+    try:
+        loc2 = adjacency_index[node2]
+    except (KeyError, IndexError):
+        neighbor_expand2 = []
+        neighbor_expand2 = neighbor_expand2 + [node1]
+        # find neighbor of neighbor
+        try:
+            loc21 = adjacency_index[node1] 
+        except (KeyError, IndexError):
+            dict2 = {'key': node2, 'neighbor': [node1]}
+            adjacency_mat_2nd.append(dict2) 
+        else:      
+            neighbor_expand2 = list(set(neighbor_expand2 + adjacency_mat[loc21]['neighbor']))
+            if node2 in neighbor_expand2:
+                neighbor_expand2.remove(node2)
+            dict2 = {'key': node2, 'neighbor': neighbor_expand2 }
+            adjacency_mat_2nd.append(dict2) 
+
+            #update other neighbors
+            for other in neighbor_expand2:
+                adjacency_mat_2nd[adjacency_index[other]]['neighbor'].append(node2)
+    else:
+        neighbor_expand2 = []
+        neighbor_expand2 = neighbor_expand2 + [node1]
+        # find neighbor of neighbor
+        try:
+            loc21 = adjacency_index[node1]
+        except (KeyError, IndexError):
+            pass 
+        else:      
+            neighbor_expand2 = list(set(neighbor_expand2 + adjacency_mat[loc21]['neighbor']))
+            if node2 in neighbor_expand2:
+                neighbor_expand2.remove(node2)
+
+				    # update others:
+            for other in neighbor_expand2:
+                adjacency_mat_2nd[adjacency_index[other]]['neighbor'].append(node2)
+                adjacency_mat_2nd[adjacency_index[other]]['neighbor']= list(set(adjacency_mat_2nd[adjacency_index[other]]['neighbor']))
+        
+        adjacency_mat_2nd[loc2]['neighbor'] = list(set(adjacency_mat_2nd[loc2]['neighbor'] + neighbor_expand2))
+        
+    return adjacency_mat_2nd
+
+
+
 
 def is_verified(adjacency_mat, adjacency_index, line):
     '''
@@ -130,12 +230,39 @@ def is_2ndFriend(adjacency_mat, adjacency_index, line):
      
 
 
-def is_4thFriend(adjacency_mat, adjacency_index, line):
+def is_4thFriend(adjacency_mat_2nd, adjacency_index, line):
     '''
         return True if the edge for given line is within 4th Friendship relationship
     '''
     result = False
-    result = True
+    temp = line.strip('\n').split(', ')
+    tokens = temp[0:5]
+    node1 = int(tokens[1])
+    node2 = int(tokens[2])
+    try:
+        loc = adjacency_index[node1] 
+    except (KeyError, IndexError):
+        #when the sender is not seen
+        pass 
+    else:      
+        # see if id1 is within 2nd order friend to id2
+        result = (node2 in adjacency_mat_2nd[loc]['neighbor'])
+        if result == False:
+            # if not, see if is 4th order friend
+            result = any(node2 in adjacency_mat_2nd[adjacency_index[x]]['neighbor'] for x in adjacency_mat_2nd[loc]['neighbor'])
+      
+    if result == False:
+        try:   # try switch the sender and receiver
+            loc2 = adjacency_index[node2]
+        except(KeyError, IndexError):
+            return False
+        else:
+            # if id2 is within 2nd order friend to id1
+            result = (node1 in adjacency_mat_2nd[loc2]['neighbor']) 
+            if result == False:
+                # if not, see if is 4th order friend
+                result = any(node1 in adjacency_mat_2nd[adjacency_index[y]]['neighbor'] for y in adjacency_mat_2nd[loc2]['neighbor']) 
+
     return result
 
 
@@ -209,7 +336,7 @@ def feature_2(read_src, read_filename, write_src, write_filename, adjacency_mat,
 
 
 
-def feature_3(read_src, read_filename, write_src, write_filename, adjacency_mat, adjacency_index, Df):
+def feature_3(read_src, read_filename, write_src, write_filename, adjacency_mat, adjacency_index, adjacency_mat_2nd, Df):
     '''
        implement feature 3:
 
@@ -225,10 +352,15 @@ def feature_3(read_src, read_filename, write_src, write_filename, adjacency_mat,
                      pass
                  else:
                      print("item "+ str(n) + ": ")
-                     if not is_4thFriend(adjacency_mat, adjacency_index, line):
+                     if not is_4thFriend(adjacency_mat_2nd, adjacency_index, line):
                          print(" unverified: This user is not within the 4th Friendship relationship. Are you sure you would like to proceed with this payment?\n")
                          Df = add_Df(Df, line)
+                         adjacency_mat_copy = []
+                         adjacency_mat_copy = copy.deepcopy(adjacency_mat)
+                         adjacency_index_copy = []
+                         adjacency_index_copy = copy.deepcopy(adjacency_index)
                          adjacency_mat, adjacency_index = add_edge(adjacency_mat, adjacency_index, line)
+                         adjacency_mat_2nd = add_edge_2nd(adjacency_mat_2nd, adjacency_mat_copy, adjacency_index_copy, line)
                          fout.write("unverified\n")
                      else:
                          print("trusted.\n")
@@ -274,17 +406,28 @@ def main(argv):
 #            outputfile3 = arg
 #    print('Input file is \n' + inputfile1 + "\n " + inputfile2)
 #    print('Output file is \n'+ outputfile1 + "\n " + outputfile2 + "\n " + outputfile3)
-    print("Preprocessing...")
     input1_path = os.path.split(inputfile1)
     input2_path = os.path.split(inputfile2)
-    preprocessing(input1_path[0], input1_path[1])
-     
-    print("Load data into data frame")
-    Df = read_df(input1_path[0], "batch_payment_new.csv")
+    if sys.version_info[0] == 3:
+       c = input('Do preprocessing first ? (Y/N)')
+    else:
+       c = raw_input('Do preprocessing first ? (Y/N)')
+       
+    if c.upper() == 'Y':
+        print("Preprocessing...")
+        new_filename = preprocessing(input1_path[0], input1_path[1])
+        
+        print("Load data into data frame")
+        Df = read_df(input1_path[0], new_filename)
+    else:
+        print("Load data into data frame")
+        Df = read_df(input1_path[0], input1_path[1])
     adj_mat, adj_index = edge_hash(Df)
 
     #duplicate
     Df1 = Df.copy()
+    adj_mat1 = []
+    adj_index1 = []
     adj_mat1 = copy.deepcopy(adj_mat)
     adj_index1 = copy.deepcopy(adj_index)
 
@@ -295,6 +438,8 @@ def main(argv):
       
     #duplicate
     Df1 = Df.copy()
+    adj_mat1 = []
+    adj_index1 = []
     adj_mat1 = copy.deepcopy(adj_mat)
     adj_index1 = copy.deepcopy(adj_index)
     #feature 2
@@ -304,12 +449,19 @@ def main(argv):
      
     #duplicate
     Df1 = Df.copy()
+    adj_mat1 = []
+    adj_index1 = []
     adj_mat1 = copy.deepcopy(adj_mat)
     adj_index1 = copy.deepcopy(adj_index)
+
+
+    adj_mat_2nd = edge_hash_2nd(adj_mat1, adj_index1)
+    adj_mat_2nd1 = []
+    adj_mat_2nd1 = copy.deepcopy(adj_mat_2nd)
     #feature 3
     print("Implement Feature 3")
     output3_path = os.path.split(outputfile3)
-    feature_3(input2_path[0], input2_path[1], output3_path[0], output3_path[1], adj_mat1, adj_index1, Df1)
+    feature_3(input2_path[0], input2_path[1], output3_path[0], output3_path[1], adj_mat1, adj_index1, adj_mat_2nd1, Df1)
 
 
 

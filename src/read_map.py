@@ -6,14 +6,41 @@ import pandas as pd
 import numpy as np
 import itertools
 import operator
+import copy
 
+def update_progress(progress):
+    '''
+        update_progress() : Displays or updates a console progress bar
+        Accepts a float between 0 and 1. Any int will be converted to a float.
+        A value under 0 represents a 'halt'.
+        A value at 1 or bigger represents 100%
+    '''
+    barLength = 40 # Modify this to change the length of the progress bar
+    status = ""
+    if isinstance(progress, int):
+        progress = float(progress)
+    if not isinstance(progress, float):
+        progress = 0
+        status = "error: progress var must be float\r\n"
+    if progress < 0:
+        progress = 0
+        status = "Halt...\r\n"
+    if progress >= 1:
+        progress = 1
+        status = "Done...\r\n"
+    block = int(round(barLength*progress))
+    text = "\rPercent: [{0:s}] {1:3.1f}% {2:s}".format( "#"*block + "-"*(barLength-block), progress*100, status)
+    sys.stdout.write(text)
+    sys.stdout.flush()
 
 def preprocessing(src, filename):
     '''
        the original file is corrupted by extra commas, just drop additional commas
     '''
     truename = os.path.join(src, filename)
-    writename = os.path.join(src, 'batch_payment_new.csv')
+    filename_1, filename_ext = os.path.splitext(filename)
+    new_filename = filename_1 + "_new" + filename_ext
+    writename = os.path.join(src, new_filename)
 
     fin = open(truename, 'r')
     fout = open(writename, 'a')
@@ -51,7 +78,7 @@ def preprocessing(src, filename):
 
     fin.close()
     fout.close()        
-        
+    return new_filename   
   
 
 def read_df(src, filename, **kwargs):
@@ -138,35 +165,30 @@ def edge_hash(dfBatch):
         count = count + 1
     sorted_adj_index = dict(sorted(adjacency_index.items(), key=operator.itemgetter(1)))
     return adjacency_mat, sorted_adj_index  
-    
-def edge_index(adjacency_map):
+   
+ 
+def edge_hash_2nd(adjacency_mat, adjacency_index):
     '''
-       build searching index for adjacnecy map
-    ''' 
-    return dict( (d['key'], index) for (index, d) in enumerate(adjacency_map) )
+        construct 2nd order adjacency matrix
+        for each dictionary
+             {'key': id1, 'neighbor': [id2, id3 ...]}
+        the neighbor includes all id1's neighbor and id1's neighbor's neighbor   
+    '''
 
+    adjacency_mat_2nd = []
+    for d in adjacency_mat:
+        neighbors = d['neighbor']
+        id1 = d['key']
+        neighbor_expand = []
+        neighbor_expand = neighbor_expand + neighbors
+        for neighbor in neighbors:
+            loc = adjacency_index[neighbor]
+            temp = adjacency_mat[loc]['neighbor']
+            neighbor_expand = neighbor_expand + temp
+        
+        neighbor_expand = list(set(neighbor_expand))
+        if id1 in neighbor_expand:
+            neighbor_expand.remove(id1)
+        adjacency_mat_2nd.append({'key': id1, 'neighbor': neighbor_expand})
 
-def update_progress(progress):
-    '''
-        update_progress() : Displays or updates a console progress bar
-        Accepts a float between 0 and 1. Any int will be converted to a float.
-        A value under 0 represents a 'halt'.
-        A value at 1 or bigger represents 100%
-    '''
-    barLength = 40 # Modify this to change the length of the progress bar
-    status = ""
-    if isinstance(progress, int):
-        progress = float(progress)
-    if not isinstance(progress, float):
-        progress = 0
-        status = "error: progress var must be float\r\n"
-    if progress < 0:
-        progress = 0
-        status = "Halt...\r\n"
-    if progress >= 1:
-        progress = 1
-        status = "Done...\r\n"
-    block = int(round(barLength*progress))
-    text = "\rPercent: [{0:s}] {1:3.1f}% {2:s}".format( "#"*block + "-"*(barLength-block), progress*100, status)
-    sys.stdout.write(text)
-    sys.stdout.flush()
+    return adjacency_mat_2nd 
