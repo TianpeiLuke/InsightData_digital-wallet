@@ -42,14 +42,14 @@ Using command
 
 Note that since the data in `stream_payment.csv` come in sequential order, we process them line by line and adding existing edges to the graph.
 
-### Feature 2: Search for 2nd Order Friend in graph
+### Feature 2: Search for 2nd-Order Friend in graph
 __Feature 2__ can be accompolished by searching for both the existing edges and the nodes that are connected to the neighbors of the new transaction. 
 
 Using command similar to the following one:
 
 	`any( id2 in adjacency_mat[adjacency_index[x]]['neighbor'] for x in adjacency_mat[adjacency_index[id1]]['neighbor'] )`
 
-### Feature 3: Search for within 4th order Friend in graph
+### Feature 3: Search for 4th-order Friend in graph
 Similar to __Feature 2__, we consider 4th order friendship as _"2nd order friend to 2nd order friend"_. 
 
 Using the 2nd-order adjacency matrix `adjacency_mat_2nd`, we have 
