@@ -279,7 +279,7 @@ def main(argv):
     input2_path = os.path.split(inputfile2)
     preprocessing(input1_path[0], input1_path[1])
      
-    print("Load data")
+    print("Load data into data frame")
     Df = read_df(input1_path[0], "batch_payment_new.csv")
     adj_mat, adj_index = edge_hash(Df)
 
