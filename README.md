@@ -1,5 +1,5 @@
 # PayMo digital wallet solutions
-   written by Tianpei (Luke) Xie
+   written by Tianpei (Luke) Xie for [Insight Data Science coding challenge](https://github.com/InsightDataScience/digital-wallet)
 
 ## Data Clean
 The given batch data are not well-formated, especially the `message` section, which contains extra commas in sentences. Some sentences even take multiple lines which are very hard to read if we load the `batch_payment.csv` file directly into the dataframe. 
